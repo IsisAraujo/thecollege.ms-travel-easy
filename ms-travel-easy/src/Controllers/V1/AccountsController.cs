@@ -45,6 +45,17 @@ namespace ms_travel_easy.src.Controllers
         [HttpPost]
         public async Task<ActionResult<Account>> Post(AccountRequest accountRequest)
         {
+            if (!IsValidEmail(accountRequest.Email))
+            {
+                var badResponse = new
+                {
+                    Message = "The Email format is incorrect.",
+                    ErrorCode = "BAD_EMAIL_FORMAT"
+                };
+
+                return BadRequest(badResponse);
+            }
+
             Account newAccount = new Account
             {
                 AccountId = Guid.NewGuid().ToString("D"),
@@ -53,9 +64,9 @@ namespace ms_travel_easy.src.Controllers
                 Email = accountRequest.Email,
                 PhoneNumber = accountRequest.PhoneNumber
             };
+
             await _accountsService.CreateAccountAsync(newAccount);
             return Created("", newAccount);
-
         }
 
         private static bool IsValidEmail(string email)
@@ -66,4 +77,3 @@ namespace ms_travel_easy.src.Controllers
         }
     }
 }
-
